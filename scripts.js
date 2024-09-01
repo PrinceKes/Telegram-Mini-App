@@ -142,6 +142,16 @@ document.getElementById('data-form').addEventListener('submit', function(event) 
 
 // secodmethodhere
 function updateBalance() {
+    // Ensure userId is available
+    if (!userId) {
+        console.error('User ID is not defined.');
+        return;
+    }
+
+    // Show a loading indicator or default message while fetching
+    const balanceElement = document.getElementById('wallet-balance');
+    balanceElement.innerText = 'Loading...';
+
     fetch('http://192.168.222.34:5000/get_balance', {
         method: 'POST',
         headers: {
@@ -149,21 +159,45 @@ function updateBalance() {
         },
         body: JSON.stringify({ user_id: userId }),
     })
-    .then(response => response.json())
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`Server error: ${response.status}`);
+        }
+        return response.json();
+    })
     .then(data => {
-        if (data.status === 'success') {
+        if (data.status === 'success' && typeof data.balance === 'number') {
             const formattedBalance = `₦${parseFloat(data.balance).toLocaleString('en-NG', { minimumFractionDigits: 2 })}`;
-            document.getElementById('wallet-balance').innerText = formattedBalance;
+            balanceElement.innerText = formattedBalance;
+        } else {
+            throw new Error('Unexpected response format.');
         }
     })
     .catch(error => {
-        document.getElementById('wallet-balance').innerText = 'Error';
+        console.error('Error fetching balance:', error);
+        balanceElement.innerText = 'Error fetching balance';
     });
 }
 
 // Update balance every 10 seconds
-setInterval(updateBalance, 10000);
+const updateInterval = 10000; // 10 seconds
+let intervalId;
 
+function startBalanceUpdates() {
+    updateBalance(); // Fetch immediately
+    intervalId = setInterval(updateBalance, updateInterval);
+}
+
+// Function to stop the updates, useful if you need to stop for any reason
+function stopBalanceUpdates() {
+    if (intervalId) {
+        clearInterval(intervalId);
+        intervalId = null;
+    }
+}
+
+// Start the balance updates when the page is ready
+document.addEventListener('DOMContentLoaded', startBalanceUpdates);
 
 
 
