@@ -139,8 +139,6 @@ document.getElementById('data-form').addEventListener('submit', function(event) 
 
 
 
-
-// secodmethodhere
 function updateBalance() {
     // Ensure userId is available
     if (!userId) {
@@ -150,6 +148,7 @@ function updateBalance() {
 
     // Show a loading indicator or default message while fetching
     const balanceElement = document.getElementById('wallet-balance');
+    console.log('Fetching wallet balance...');
     balanceElement.innerText = 'Loading...';
 
     fetch('http://192.168.222.34:5000/get_balance', {
@@ -160,15 +159,18 @@ function updateBalance() {
         body: JSON.stringify({ user_id: userId }),
     })
     .then(response => {
+        console.log('Received response:', response);
         if (!response.ok) {
             throw new Error(`Server error: ${response.status}`);
         }
         return response.json();
     })
     .then(data => {
+        console.log('Parsed JSON data:', data);
         if (data.status === 'success' && typeof data.balance === 'number') {
             const formattedBalance = `₦${parseFloat(data.balance).toLocaleString('en-NG', { minimumFractionDigits: 2 })}`;
             balanceElement.innerText = formattedBalance;
+            console.log('Updated balance:', formattedBalance);
         } else {
             throw new Error('Unexpected response format.');
         }
@@ -184,13 +186,14 @@ const updateInterval = 10000; // 10 seconds
 let intervalId;
 
 function startBalanceUpdates() {
+    console.log('Starting balance updates...');
     updateBalance(); // Fetch immediately
     intervalId = setInterval(updateBalance, updateInterval);
 }
 
-// Function to stop the updates, useful if you need to stop for any reason
 function stopBalanceUpdates() {
     if (intervalId) {
+        console.log('Stopping balance updates...');
         clearInterval(intervalId);
         intervalId = null;
     }
@@ -198,7 +201,6 @@ function stopBalanceUpdates() {
 
 // Start the balance updates when the page is ready
 document.addEventListener('DOMContentLoaded', startBalanceUpdates);
-
 
 
 
