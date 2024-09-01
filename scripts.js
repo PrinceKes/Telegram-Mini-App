@@ -138,8 +138,38 @@ document.getElementById('data-form').addEventListener('submit', function(event) 
 
 
 
+// Ensure the DOM is fully loaded before accessing the Telegram WebApp object
+document.addEventListener('DOMContentLoaded', function () {
+    // Check if the Telegram object and WebApp property are defined
+    if (typeof Telegram !== 'undefined' && Telegram.WebApp) {
+        try {
+            // Safely access the WebApp properties or methods here
+            const webApp = Telegram.WebApp;
+            
+            // Example: Using WebApp properties
+            console.log('Telegram WebApp initialized:', webApp);
+            
+            // Example of working with WebApp properties
+            // Replace the following line with your actual usage
+            const appData = webApp.initDataUnsafe || {};
+            console.log('WebApp data:', appData);
+            
+            // You can now safely use the WebApp object
+            // Example: Setting the background color of the WebApp
+            webApp.setBackgroundColor('#ffffff');
 
+        } catch (error) {
+            console.error('An error occurred while interacting with Telegram WebApp:', error);
+        }
+    } else {
+        console.error('Telegram WebApp is not available or has not been initialized.');
+    }
+});
+
+// Function to update the balance (as an example, using fetch)
 function updateBalance() {
+    const userId = getUserId(); // Assume getUserId() is a function that returns the user ID
+
     // Ensure userId is available
     if (!userId) {
         console.error('User ID is not defined.');
@@ -180,6 +210,27 @@ function updateBalance() {
         balanceElement.innerText = 'Error fetching balance';
     });
 }
+
+// Function to get the user ID (you'll need to implement this)
+function getUserId() {
+    // Replace with actual logic to get the user ID
+    return '12345'; // Example user ID
+}
+
+// Start balance updates when the WebApp is ready (after DOMContentLoaded)
+document.addEventListener('DOMContentLoaded', function () {
+    console.log('Starting balance updates...');
+    updateBalance(); // Fetch immediately
+    setInterval(updateBalance, 10000); // Update balance every 10 seconds
+});
+
+
+
+
+
+
+
+
 
 // Update balance every 10 seconds
 const updateInterval = 10000; // 10 seconds
