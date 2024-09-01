@@ -137,7 +137,6 @@ document.getElementById('data-form').addEventListener('submit', function(event) 
 // });
 
 
-
 // Ensure the DOM is fully loaded before accessing the Telegram WebApp object
 document.addEventListener('DOMContentLoaded', function () {
     // Check if the Telegram object and WebApp property are defined
@@ -146,15 +145,13 @@ document.addEventListener('DOMContentLoaded', function () {
             // Safely access the WebApp properties or methods here
             const webApp = Telegram.WebApp;
             
-            // Example: Using WebApp properties
+            // Log WebApp initialization to the console
             console.log('Telegram WebApp initialized:', webApp);
             
             // Example of working with WebApp properties
-            // Replace the following line with your actual usage
             const appData = webApp.initDataUnsafe || {};
             console.log('WebApp data:', appData);
             
-            // You can now safely use the WebApp object
             // Example: Setting the background color of the WebApp
             webApp.setBackgroundColor('#ffffff');
 
@@ -166,7 +163,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 });
 
-// Function to update the balance (as an example, using fetch)
+// Function to update the balance and log information to the console
 function updateBalance() {
     const userId = getUserId(); // Assume getUserId() is a function that returns the user ID
 
@@ -196,13 +193,13 @@ function updateBalance() {
         return response.json();
     })
     .then(data => {
-        console.log('Parsed JSON data:', data);
+        console.log('Parsed JSON data from server:', data);
         if (data.status === 'success' && typeof data.balance === 'number') {
             const formattedBalance = `₦${parseFloat(data.balance).toLocaleString('en-NG', { minimumFractionDigits: 2 })}`;
             balanceElement.innerText = formattedBalance;
-            console.log('Updated balance:', formattedBalance);
+            console.log('Updated balance displayed on the page:', formattedBalance);
         } else {
-            throw new Error('Unexpected response format.');
+            throw new Error('Unexpected response format from the server.');
         }
     })
     .catch(error => {
@@ -222,113 +219,4 @@ document.addEventListener('DOMContentLoaded', function () {
     console.log('Starting balance updates...');
     updateBalance(); // Fetch immediately
     setInterval(updateBalance, 10000); // Update balance every 10 seconds
-});
-
-
-
-
-
-
-
-
-
-// Update balance every 10 seconds
-const updateInterval = 10000; // 10 seconds
-let intervalId;
-
-function startBalanceUpdates() {
-    console.log('Starting balance updates...');
-    updateBalance(); // Fetch immediately
-    intervalId = setInterval(updateBalance, updateInterval);
-}
-
-function stopBalanceUpdates() {
-    if (intervalId) {
-        console.log('Stopping balance updates...');
-        clearInterval(intervalId);
-        intervalId = null;
-    }
-}
-
-// Start the balance updates when the page is ready
-document.addEventListener('DOMContentLoaded', startBalanceUpdates);
-
-
-
-
-
-
-
-
-
-
-
-
-// Submit purchase function
-function submitPurchase() {
-    const userId = '<user_id>';  // Get the user ID from the bot or context
-    const pin = document.getElementById('pin').value;
-    const bundlePrice = getSelectedBundlePrice();  // Get this from your WebView
-
-    fetch('http://127.0.0.1:5000/verify_purchase', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-            user_id: userId,
-            pin: pin,
-            bundle_price: bundlePrice
-        }),
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.status === 'success') {
-            alert('Purchase successful! Your new balance is: ' + data.new_balance);
-        } else {
-            alert('Error: ' + data.message);
-        }
-    })
-    .catch((error) => {
-        console.error('Error:', error);
-    });
-}
-
-// Helper function to get selected bundle price (implement as needed)
-function getSelectedBundlePrice() {
-    const dataPlanSelect = document.getElementById('data-plan');
-    const selectedPlanId = dataPlanSelect.value;
-    const network = document.getElementById('network').value;
-
-    if (network && selectedPlanId) {
-        const selectedPlan = dataPlans[network].find(plan => plan.id == selectedPlanId);
-        return selectedPlan ? selectedPlan.amount : '';
-    }
-    return '';
-}
-
-// Call fetch balance on DOMContentLoaded
-document.addEventListener('DOMContentLoaded', function() {
-    const userId = urlParams.get('user_id'); // Retrieve user ID from URL parameters
-
-    if (userId) {
-        fetch('http://127.0.0.1:5000/get_balance', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ user_id: userId }),
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.status === 'success') {
-                document.getElementById('wallet-balance').textContent = `₦${data.balance.toFixed(2)}`;
-            } else {
-                alert('Error: ' + data.message);
-            }
-        })
-        .catch((error) => {
-            console.error('Error fetching wallet balance:', error);
-        });
-    }
 });
