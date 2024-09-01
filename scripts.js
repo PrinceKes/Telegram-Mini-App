@@ -86,83 +86,83 @@ document.getElementById('data-form').addEventListener('submit', function(event) 
 
 
 
-function displayDebugMessage(message) {
-    const debugOutput = document.getElementById('debug-output');
-    const messageElement = document.createElement('p');
-    messageElement.textContent = message;
-    debugOutput.appendChild(messageElement);
-}
+// function displayDebugMessage(message) {
+//     const debugOutput = document.getElementById('debug-output');
+//     const messageElement = document.createElement('p');
+//     messageElement.textContent = message;
+//     debugOutput.appendChild(messageElement);
+// }
 
-document.addEventListener('DOMContentLoaded', function() {
-    const tg = window.Telegram.WebApp;
-    const urlParams = new URLSearchParams(window.location.search);
-    let userId = urlParams.get('user_id');
+// document.addEventListener('DOMContentLoaded', function() {
+//     const tg = window.Telegram.WebApp;
+//     const urlParams = new URLSearchParams(window.location.search);
+//     let userId = urlParams.get('user_id');
 
-    displayDebugMessage('User ID: ' + userId);
+//     displayDebugMessage('User ID: ' + userId);
 
-    if (!userId && tg.initDataUnsafe && tg.initDataUnsafe.user) {
-        userId = tg.initDataUnsafe.user.id;
-    }
+//     if (!userId && tg.initDataUnsafe && tg.initDataUnsafe.user) {
+//         userId = tg.initDataUnsafe.user.id;
+//     }
 
-    if (userId) {
-        displayDebugMessage('Fetching balance for user ID: ' + userId);
+//     if (userId) {
+//         displayDebugMessage('Fetching balance for user ID: ' + userId);
 
-        fetch('http://192.168.222.34:5000/get_balance', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ user_id: userId }),
-        })
-        .then(response => {
-            displayDebugMessage('Received response: ' + response.status);
-            return response.json();
-        })
-        .then(data => {
-            displayDebugMessage('Received data: ' + JSON.stringify(data));
+//         fetch('http://192.168.222.34:5000/get_balance', {
+//             method: 'POST',
+//             headers: {
+//                 'Content-Type': 'application/json',
+//             },
+//             body: JSON.stringify({ user_id: userId }),
+//         })
+//         .then(response => {
+//             displayDebugMessage('Received response: ' + response.status);
+//             return response.json();
+//         })
+//         .then(data => {
+//             displayDebugMessage('Received data: ' + JSON.stringify(data));
 
-            if (data.status === 'success') {
-                const formattedBalance = `₦${parseFloat(data.balance).toLocaleString('en-NG', { minimumFractionDigits: 2 })}`;
-                document.getElementById('wallet-balance').innerText = formattedBalance;
-            } else {
-                displayDebugMessage('Failed to fetch balance: ' + data.message);
-            }
-        })
-        .catch(error => {
-            displayDebugMessage('Error fetching balance: ' + error);
-        });
-    } else {
-        displayDebugMessage('User ID not found.');
-    }
-});
+//             if (data.status === 'success') {
+//                 const formattedBalance = `₦${parseFloat(data.balance).toLocaleString('en-NG', { minimumFractionDigits: 2 })}`;
+//                 document.getElementById('wallet-balance').innerText = formattedBalance;
+//             } else {
+//                 displayDebugMessage('Failed to fetch balance: ' + data.message);
+//             }
+//         })
+//         .catch(error => {
+//             displayDebugMessage('Error fetching balance: ' + error);
+//         });
+//     } else {
+//         displayDebugMessage('User ID not found.');
+//     }
+// });
 
 
 
 
 
 // secodmethodhere
-// function updateBalance() {
-//     fetch('http://192.168.222.34:5000/get_balance', {
-//         method: 'POST',
-//         headers: {
-//             'Content-Type': 'application/json',
-//         },
-//         body: JSON.stringify({ user_id: userId }),
-//     })
-//     .then(response => response.json())
-//     .then(data => {
-//         if (data.status === 'success') {
-//             const formattedBalance = `₦${parseFloat(data.balance).toLocaleString('en-NG', { minimumFractionDigits: 2 })}`;
-//             document.getElementById('wallet-balance').innerText = formattedBalance;
-//         }
-//     })
-//     .catch(error => {
-//         document.getElementById('wallet-balance').innerText = 'Error';
-//     });
-// }
+function updateBalance() {
+    fetch('http://192.168.222.34:5000/get_balance', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ user_id: userId }),
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === 'success') {
+            const formattedBalance = `₦${parseFloat(data.balance).toLocaleString('en-NG', { minimumFractionDigits: 2 })}`;
+            document.getElementById('wallet-balance').innerText = formattedBalance;
+        }
+    })
+    .catch(error => {
+        document.getElementById('wallet-balance').innerText = 'Error';
+    });
+}
 
-// // Update balance every 10 seconds
-// setInterval(updateBalance, 10000);
+// Update balance every 10 seconds
+setInterval(updateBalance, 10000);
 
 
 
