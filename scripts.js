@@ -138,7 +138,6 @@ document.getElementById('data-form').addEventListener('submit', function(event) 
 
 
 
-
 // Function to display messages on the HTML page for debugging
 function displayConsoleMessage(message, isError = false) {
     const consoleOutput = document.getElementById('console-output');
@@ -154,43 +153,96 @@ function displayConsoleMessage(message, isError = false) {
     consoleOutput.appendChild(messageElement);
 }
 
-// Extract user_id from the URL parameter (useful when testing in a normal browser)
-const urlParams = new URLSearchParams(window.location.search);
-const userId = urlParams.get('user_id'); // e.g., 'https://yourapp.com/?user_id=1446675700'
+// Check if running inside Telegram WebApp environment
+if (typeof window.Telegram !== 'undefined' && window.Telegram.WebApp) {
+    const tg = window.Telegram.WebApp;
 
-if (userId) {
-    displayConsoleMessage('Fetching balance for user ID: ' + userId);
+    // Attempt to fetch user_id from the URL parameter (useful when testing in a normal browser)
+    const urlParams = new URLSearchParams(window.location.search);
+    let userId = urlParams.get('user_id');
 
-    // Make a POST request to your backend server to fetch the user's wallet balance
-    fetch('https://telegramserverbot.onrender.com/get_balance', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ user_id: userId }),  // Send the user ID as payload
-    })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            return response.json();
+    // Fallback: Fetch user_id directly from Telegram if not found in URL
+    if (!userId && tg.initDataUnsafe && tg.initDataUnsafe.user) {
+        userId = tg.initDataUnsafe.user.id;
+    }
+
+    if (userId) {
+        displayConsoleMessage('Fetching balance for user ID: ' + userId);
+
+        // Make a POST request to your backend server to fetch the user's wallet balance
+        fetch('https://telegramserverbot.onrender.com/get_balance', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ user_id: userId }),  // Send the user ID as payload
         })
-        .then(data => {
-            console.log('Received balance data:', data);  // Log the response data for debugging
-            displayConsoleMessage('Received balance data: ' + JSON.stringify(data));  // Show response on HTML page
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Received balance data:', data);  // Log the response data for debugging
+                displayConsoleMessage('Received balance data: ' + JSON.stringify(data));  // Show response on HTML page
 
-            if (data.status === 'success') {
-                const formattedBalance = `₦${data.balance.toLocaleString('en-NG', { minimumFractionDigits: 2 })}`;
-                document.getElementById('wallet-balance').innerText = formattedBalance;  // Update the wallet balance element
-                displayConsoleMessage('Balance displayed successfully.');
-            } else {
-                displayConsoleMessage('Failed to fetch balance: ' + data.message, true);
-            }
-        })
-        .catch(error => {
-            console.error('Error fetching balance:', error);
-            displayConsoleMessage('Error fetching balance: ' + error, true);
-        });
+                if (data.status === 'success') {
+                    const formattedBalance = `₦${data.balance.toLocaleString('en-NG', { minimumFractionDigits: 2 })}`;
+                    document.getElementById('wallet-balance').innerText = formattedBalance;  // Update the wallet balance element
+                    displayConsoleMessage('Balance displayed successfully.');
+                } else {
+                    displayConsoleMessage('Failed to fetch balance: ' + data.message, true);
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching balance:', error);
+                displayConsoleMessage('Error fetching balance: ' + error, true);
+            });
+    } else {
+        displayConsoleMessage('User ID not found in URL or Telegram data.', true);
+    }
 } else {
-    displayConsoleMessage('User ID not found in URL.', true);
+    displayConsoleMessage('Not running in Telegram WebApp environment. Some functionalities are disabled.', true);
+
+    // Handle running outside Telegram environment: extract user_id from the URL parameter for testing in a browser
+    const urlParams = new URLSearchParams(window.location.search);
+    const userId = urlParams.get('user_id');
+
+    if (userId) {
+        displayConsoleMessage('Fetching balance for user ID (browser mode): ' + userId);
+
+        // Make a POST request to your backend server to fetch the user's wallet balance
+        fetch('https://telegramserverbot.onrender.com/get_balance', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ user_id: userId }),  // Send the user ID as payload
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Received balance data:', data);  // Log the response data for debugging
+                displayConsoleMessage('Received balance data: ' + JSON.stringify(data));  // Show response on HTML page
+
+                if (data.status === 'success') {
+                    const formattedBalance = `₦${data.balance.toLocaleString('en-NG', { minimumFractionDigits: 2 })}`;
+                    document.getElementById('wallet-balance').innerText = formattedBalance;  // Update the wallet balance element
+                    displayConsoleMessage('Balance displayed successfully.');
+                } else {
+                    displayConsoleMessage('Failed to fetch balance: ' + data.message, true);
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching balance:', error);
+                displayConsoleMessage('Error fetching balance: ' + error, true);
+            });
+    } else {
+        displayConsoleMessage('User ID not found in URL.', true);
+    }
 }
