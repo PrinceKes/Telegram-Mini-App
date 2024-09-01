@@ -86,36 +86,62 @@ document.getElementById('data-form').addEventListener('submit', function(event) 
 
 
 
-// // Function to display messages on the HTML page
-// function displayConsoleMessage(message, isError = false) {
-//     const consoleOutput = document.getElementById('console-output');
-//     const messageElement = document.createElement('p');
-//     messageElement.textContent = message;
+function displayDebugMessage(message) {
+    const debugOutput = document.getElementById('debug-output');
+    const messageElement = document.createElement('p');
+    messageElement.textContent = message;
+    debugOutput.appendChild(messageElement);
+}
 
-//     if (isError) {
-//         messageElement.style.color = 'red';
-//     } else {
-//         messageElement.style.color = 'green';
-//     }
+document.addEventListener('DOMContentLoaded', function() {
+    const tg = window.Telegram.WebApp;
+    const urlParams = new URLSearchParams(window.location.search);
+    let userId = urlParams.get('user_id');
 
-//     consoleOutput.appendChild(messageElement);
-// }
+    displayDebugMessage('User ID: ' + userId);
 
-// // Initialize Telegram WebApp (Make sure this exists in your environment)
-// const tg = window.Telegram.WebApp;
+    if (!userId && tg.initDataUnsafe && tg.initDataUnsafe.user) {
+        userId = tg.initDataUnsafe.user.id;
+    }
 
-// // Attempt to fetch user_id from the URL
-// const urlParams = new URLSearchParams(window.location.search);
-// let userId = urlParams.get('user_id');
+    if (userId) {
+        displayDebugMessage('Fetching balance for user ID: ' + userId);
 
-// // Fallback: Fetch user_id directly from Telegram if not found in URL
-// if (!userId && tg.initDataUnsafe && tg.initDataUnsafe.user) {
-//     userId = tg.initDataUnsafe.user.id;
-// }
+        fetch('http://192.168.222.34:5000/get_balance', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ user_id: userId }),
+        })
+        .then(response => {
+            displayDebugMessage('Received response: ' + response.status);
+            return response.json();
+        })
+        .then(data => {
+            displayDebugMessage('Received data: ' + JSON.stringify(data));
 
-// if (userId) {
-//     displayConsoleMessage('Fetching balance for user ID: ' + userId);
+            if (data.status === 'success') {
+                const formattedBalance = `₦${parseFloat(data.balance).toLocaleString('en-NG', { minimumFractionDigits: 2 })}`;
+                document.getElementById('wallet-balance').innerText = formattedBalance;
+            } else {
+                displayDebugMessage('Failed to fetch balance: ' + data.message);
+            }
+        })
+        .catch(error => {
+            displayDebugMessage('Error fetching balance: ' + error);
+        });
+    } else {
+        displayDebugMessage('User ID not found.');
+    }
+});
 
+
+
+
+
+// secodmethodhere
+// function updateBalance() {
 //     fetch('http://192.168.222.34:5000/get_balance', {
 //         method: 'POST',
 //         headers: {
@@ -125,67 +151,26 @@ document.getElementById('data-form').addEventListener('submit', function(event) 
 //     })
 //     .then(response => response.json())
 //     .then(data => {
-//         displayConsoleMessage('Received balance data: ' + JSON.stringify(data));
-
 //         if (data.status === 'success') {
-//             // Format and update the wallet balance on the page
 //             const formattedBalance = `₦${parseFloat(data.balance).toLocaleString('en-NG', { minimumFractionDigits: 2 })}`;
 //             document.getElementById('wallet-balance').innerText = formattedBalance;
-//         } else {
-//             displayConsoleMessage('Failed to fetch balance: ' + data.message, true);
 //         }
 //     })
 //     .catch(error => {
-//         displayConsoleMessage('Error fetching balance: ' + error, true);
+//         document.getElementById('wallet-balance').innerText = 'Error';
 //     });
-// } else {
-//     displayConsoleMessage('User ID not found in URL or Telegram data.', true);
 // }
 
+// // Update balance every 10 seconds
+// setInterval(updateBalance, 10000);
 
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('DOM fully loaded and parsed.');
 
-    const tg = window.Telegram.WebApp;
-    const urlParams = new URLSearchParams(window.location.search);
-    let userId = urlParams.get('user_id');
 
-    if (!userId && tg.initDataUnsafe && tg.initDataUnsafe.user) {
-        userId = tg.initDataUnsafe.user.id;
-    }
 
-    console.log('User ID:', userId);
 
-    if (userId) {
-        console.log('Fetching balance...');
-        fetch('http://192.168.222.34:5000/get_balance', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ user_id: userId }),
-        })
-        .then(response => {
-            console.log('Received response:', response);
-            return response.json();
-        })
-        .then(data => {
-            console.log('Received balance data:', data);
 
-            if (data.status === 'success') {
-                const formattedBalance = `₦${parseFloat(data.balance).toLocaleString('en-NG', { minimumFractionDigits: 2 })}`;
-                document.getElementById('wallet-balance').innerText = formattedBalance;
-            } else {
-                console.error('Failed to fetch balance:', data.message);
-            }
-        })
-        .catch(error => {
-            console.error('Error fetching balance:', error);
-        });
-    } else {
-        console.error('User ID not found in URL or Telegram data.');
-    }
-});
+
+
 
 
 
