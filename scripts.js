@@ -137,86 +137,60 @@ document.getElementById('data-form').addEventListener('submit', function(event) 
 // });
 
 
-// Ensure the DOM is fully loaded before accessing the Telegram WebApp object
-document.addEventListener('DOMContentLoaded', function () {
-    // Check if the Telegram object and WebApp property are defined
-    if (typeof Telegram !== 'undefined' && Telegram.WebApp) {
-        try {
-            // Safely access the WebApp properties or methods here
-            const webApp = Telegram.WebApp;
-            
-            // Log WebApp initialization to the console
-            console.log('Telegram WebApp initialized:', webApp);
-            
-            // Example of working with WebApp properties
-            const appData = webApp.initDataUnsafe || {};
-            console.log('WebApp data:', appData);
-            
-            // Example: Setting the background color of the WebApp
-            webApp.setBackgroundColor('#ffffff');
 
-        } catch (error) {
-            console.error('An error occurred while interacting with Telegram WebApp:', error);
-        }
+
+// Function to display messages on the HTML page for debugging
+function displayConsoleMessage(message, isError = false) {
+    const consoleOutput = document.getElementById('console-output');
+    const messageElement = document.createElement('p');
+    messageElement.textContent = message;
+
+    if (isError) {
+        messageElement.style.color = 'red';
     } else {
-        console.error('Telegram WebApp is not available or has not been initialized.');
-    }
-});
-
-// Function to update the balance and log information to the console
-function updateBalance() {
-    const userId = getUserId(); // Assume getUserId() is a function that returns the user ID
-
-    // Ensure userId is available
-    if (!userId) {
-        console.error('User ID is not defined.');
-        return;
+        messageElement.style.color = 'green';
     }
 
-    // Show a loading indicator or default message while fetching
-    const balanceElement = document.getElementById('wallet-balance');
-    console.log('Fetching wallet balance...');
-    balanceElement.innerText = 'Loading...';
+    consoleOutput.appendChild(messageElement);
+}
 
-    fetch('http://192.168.222.34:5000/get_balance', {
+// Extract user_id from the URL parameter (useful when testing in a normal browser)
+const urlParams = new URLSearchParams(window.location.search);
+const userId = urlParams.get('user_id'); // e.g., 'https://yourapp.com/?user_id=1446675700'
+
+if (userId) {
+    displayConsoleMessage('Fetching balance for user ID: ' + userId);
+
+    // Make a POST request to your backend server to fetch the user's wallet balance
+    fetch('https://telegramserverbot.onrender.com/get_balance', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ user_id: userId }),
+        body: JSON.stringify({ user_id: userId }),  // Send the user ID as payload
     })
-    .then(response => {
-        console.log('Received response:', response);
-        if (!response.ok) {
-            throw new Error(`Server error: ${response.status}`);
-        }
-        return response.json();
-    })
-    .then(data => {
-        console.log('Parsed JSON data from server:', data);
-        if (data.status === 'success' && typeof data.balance === 'number') {
-            const formattedBalance = `₦${parseFloat(data.balance).toLocaleString('en-NG', { minimumFractionDigits: 2 })}`;
-            balanceElement.innerText = formattedBalance;
-            console.log('Updated balance displayed on the page:', formattedBalance);
-        } else {
-            throw new Error('Unexpected response format from the server.');
-        }
-    })
-    .catch(error => {
-        console.error('Error fetching balance:', error);
-        balanceElement.innerText = 'Error fetching balance';
-    });
-}
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Received balance data:', data);  // Log the response data for debugging
+            displayConsoleMessage('Received balance data: ' + JSON.stringify(data));  // Show response on HTML page
 
-// Function to get the user ID (you'll need to implement this)
-function getUserId() {
-    // Replace with actual logic to get the user ID
-    return '12345'; // Example user ID
+            if (data.status === 'success') {
+                const formattedBalance = `₦${data.balance.toLocaleString('en-NG', { minimumFractionDigits: 2 })}`;
+                document.getElementById('wallet-balance').innerText = formattedBalance;  // Update the wallet balance element
+                displayConsoleMessage('Balance displayed successfully.');
+            } else {
+                displayConsoleMessage('Failed to fetch balance: ' + data.message, true);
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching balance:', error);
+            displayConsoleMessage('Error fetching balance: ' + error, true);
+        });
+} else {
+    displayConsoleMessage('User ID not found in URL.', true);
 }
-
-// Start balance updates when the WebApp is ready (after DOMContentLoaded)
-document.addEventListener('DOMContentLoaded', function () {
-    console.log('Starting balance updates...');
-    updateBalance(); // Fetch immediately
-    setInterval(updateBalance, 10000); // Update balance every 10 seconds
-});
