@@ -81,14 +81,17 @@ document.getElementById('data-form').addEventListener('submit', function(event) 
 
 
 
-
 // Function to fetch user data
 function fetchUserData(userId) {
     // Decode the URL-encoded userId and strip braces if necessary
     userId = decodeURIComponent(userId);
+    console.log('Decoded User ID:', userId);  // Debugging output
+
     if (userId.startsWith('{') && userId.endsWith('}')) {
         userId = userId.slice(1, -1);  // Remove braces
     }
+
+    console.log('Formatted User ID for API call:', userId);  // Debugging output
 
     // Make a GET request to the Flask server API endpoint
     fetch(`http://127.0.0.1:5000/api/user?user_id=${userId}`)
@@ -96,6 +99,7 @@ function fetchUserData(userId) {
         .then(data => {
             if (data.error) {
                 document.querySelector('.balance-box').innerHTML = 'User not found';
+                console.error('User not found in the database');  // Debugging output
             } else {
                 // Populate the HTML elements with user data
                 document.getElementById('user-id').textContent = userId;
@@ -109,6 +113,8 @@ function fetchUserData(userId) {
 // Extract user_id from URL parameter
 const urlParams = new URLSearchParams(window.location.search);
 const userId = urlParams.get('user_id');  // Extract raw encoded user ID
+
+console.log('Raw User ID from URL:', userId);  // Debugging output
 
 // Fetch user data if user_id is provided
 if (userId) {
