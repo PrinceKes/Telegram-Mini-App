@@ -81,6 +81,34 @@ document.getElementById('data-form').addEventListener('submit', function(event) 
 
 
 
+
+        // Function to fetch user data
+        function fetchUserData(userId) {
+            // Make a GET request to the local Flask server API endpoint
+            fetch(`http://127.0.0.1:5000/api/user?user_id=${userId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        document.getElementById('user-info').innerHTML = 'User not found';
+                    } else {
+                        // Populate the HTML elements with user data
+                        document.getElementById('user-id').textContent = userId;
+                        document.getElementById('wallet-balance').textContent = data.wallet_balance;
+                        document.getElementById('phone-number').textContent = data.phone;
+                    }
+                })
+                .catch(error => console.error('Error fetching user data:', error));
+        }
+
+        // Extract user_id from URL parameter
+        const urlParams = new URLSearchParams(window.location.search);
+        const userId = urlParams.get('user_id');
+
+        // Fetch user data if user_id is provided
+        if (userId) {
+            fetchUserData(userId);
+        }
+
         // JavaScript to display the user data
         document.getElementById('user-id').textContent = "{{ user_id }}";
         document.getElementById('wallet-balance').textContent = "{{ wallet_balance }}";
