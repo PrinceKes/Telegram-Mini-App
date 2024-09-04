@@ -88,7 +88,7 @@ function fetchUserData(userId) {
     }
 
     // Make a GET request to the local Flask server API endpoint
-    fetch(`http://192.168.222.34:5000/api/user?user_id=${userId}`)
+    fetch(`http://192.168.111.34:5000/api/user?user_id=${userId}`)
         .then(response => response.json())
         .then(data => {
             if (data.error) {
