@@ -113,35 +113,35 @@ if (userId) {
 }
 
 
-        // // Function to fetch user data
-        // function fetchUserData(userId) {
-        //     // Make a GET request to the local Flask server API endpoint
-        //     fetch(`http://127.0.0.1:5000/api/user?user_id=${userId}`)
-        //         .then(response => response.json())
-        //         .then(data => {
-        //             if (data.error) {
-        //                 document.getElementById('user-info').innerHTML = 'User not found';
-        //             } else {
-        //                 // Populate the HTML elements with user data
-        //                 document.getElementById('user-id').textContent = userId;
-        //                 document.getElementById('wallet-balance').textContent = data.wallet_balance;
-        //                 document.getElementById('phone-number').textContent = data.phone;
-        //             }
-        //         })
-        //         .catch(error => console.error('Error fetching user data:', error));
-        // }
 
-        // // Extract user_id from URL parameter
-        // const urlParams = new URLSearchParams(window.location.search);
-        // const userId = urlParams.get('user_id');
 
-        // // Fetch user data if user_id is provided
-        // if (userId) {
-        //     fetchUserData(userId);
-        // }
+        // // Function to submit and purchase
+// Handle form submission
+document.getElementById('data-form').addEventListener('submit', function(event) {
+    event.preventDefault();
 
-        // // JavaScript to display the user data
-        // document.getElementById('user-id').textContent = "{{ user_id }}";
-        // document.getElementById('wallet-balance').textContent = "{{ wallet_balance }}";
-        // document.getElementById('phone-number').textContent = "{{ phone }}";
-  
+    const userId = new URLSearchParams(window.location.search).get('user_id');
+    const pin = document.getElementById('pin').value;
+
+    if (userId && pin) {
+        fetch('http://127.0.0.1:5000/api/validate-pin', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ user_id: userId, pin: pin }),
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.valid) {
+                alert('PIN is correct. Proceeding with data purchase...');
+                // Proceed with further actions like purchasing data
+            } else {
+                alert('Incorrect PIN. Please try again.');
+            }
+        })
+        .catch(error => console.error('Error validating PIN:', error));
+    } else {
+        alert('Please enter a PIN.');
+    }
+});
