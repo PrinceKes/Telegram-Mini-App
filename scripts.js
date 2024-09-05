@@ -101,6 +101,7 @@ const dataPlans = {
 
 
 
+
 // Handle network selection
 document.getElementById('network').addEventListener('change', function() {
     const network = this.value;
@@ -112,7 +113,7 @@ document.getElementById('network').addEventListener('change', function() {
     dataPlanSelect.innerHTML = '<option value="">Select Data Plan</option>';
     costInput.value = '';
 
-    if (network && dataPlans[network]) {
+    if (network) {
         const types = [...new Set(dataPlans[network].plans.map(plan => plan.planType))];
         types.forEach(type => {
             const option = document.createElement('option');
@@ -133,7 +134,7 @@ document.getElementById('data-type').addEventListener('change', function() {
     dataPlanSelect.innerHTML = '<option value="">Select Data Plan</option>';
     costInput.value = '';
 
-    if (network && type && dataPlans[network]) {
+    if (network && type) {
         const filteredPlans = dataPlans[network].plans.filter(plan => plan.planType === type);
         filteredPlans.forEach(plan => {
             const option = document.createElement('option');
@@ -144,56 +145,6 @@ document.getElementById('data-type').addEventListener('change', function() {
     }
 });
 
-
-// // Handle network selection
-// document.getElementById('network').addEventListener('change', function() {
-//     const network = this.value;
-//     const dataTypeSelect = document.getElementById('data-type');
-//     const dataPlanSelect = document.getElementById('data-plan');
-//     const costInput = document.getElementById('cost');
-
-//     dataTypeSelect.innerHTML = '<option value="">Select Data Type</option>';
-//     dataPlanSelect.innerHTML = '<option value="">Select Data Plan</option>';
-//     costInput.value = '';
-
-//     if (network) {
-//         const types = [...new Set(dataPlans[network].map(plan => plan.planType))];
-//         types.forEach(type => {
-//             const option = document.createElement('option');
-//             option.value = type;
-//             option.textContent = type;
-//             dataTypeSelect.appendChild(option);
-//         });
-//     }
-// });
-
-
-
-// // Handle data type selection
-// document.getElementById('data-type').addEventListener('change', function() {
-//     const network = document.getElementById('network').value;
-//     const type = this.value;
-//     const dataPlanSelect = document.getElementById('data-plan');
-//     const costInput = document.getElementById('cost');
-
-//     dataPlanSelect.innerHTML = '<option value="">Select Data Plan</option>';
-//     costInput.value = '';
-
-//     if (network && type) {
-//         const filteredPlans = dataPlans[network].filter(plan => plan.planType === type);
-//         filteredPlans.forEach(plan => {
-//             const option = document.createElement('option');
-//             option.value = plan.id;
-//             option.textContent = `${plan.size} - ${plan.amount} (${plan.validity})`;
-//             dataPlanSelect.appendChild(option);
-//         });
-//     }
-// });
-
-
-
-
-
 // Handle data plan selection
 document.getElementById('data-plan').addEventListener('change', function() {
     const network = document.getElementById('network').value;
@@ -202,13 +153,9 @@ document.getElementById('data-plan').addEventListener('change', function() {
 
     if (network && type && planId) {
         const selectedPlan = dataPlans[network].plans.find(plan => plan.id == planId);
-        if (selectedPlan) {
-            document.getElementById('cost').value = selectedPlan.amount;
-        }
+        document.getElementById('cost').value = selectedPlan.amount;
     }
 });
-
-
 
 // Handle form submission
 document.getElementById('data-form').addEventListener('submit', function(event) {
@@ -217,18 +164,23 @@ document.getElementById('data-form').addEventListener('submit', function(event) 
     const userId = new URLSearchParams(window.location.search).get('user_id');
     const pin = document.getElementById('pin').value;
     const network = document.getElementById('network').value;
+    const networkId = dataPlans[network].pk;  // Use correct network_id here
     const plan = document.getElementById('data-plan').value;
     const cost = parseFloat(document.getElementById('cost').value.replace('₦', '').replace(',', ''));
 
     if (userId && pin && network && plan && cost) {
-        const networkId = dataPlans[network].pk;  // Get the network primary key (ID)
-        
         fetch('http://127.0.0.1:5000/api/validate-pin', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ user_id: userId, pin: pin, network_id: networkId, plan: plan, cost: cost }),  // Send network_id instead of network
+            body: JSON.stringify({ 
+                user_id: userId, 
+                pin: pin, 
+                network_id: networkId,  // Correct network_id here
+                plan: plan, 
+                cost: cost 
+            }),
         })
         .then(response => response.json())
         .then(data => {
@@ -243,6 +195,62 @@ document.getElementById('data-form').addEventListener('submit', function(event) 
         alert('Please fill all fields correctly.');
     }
 });
+// // Handle network selection
+// document.getElementById('network').addEventListener('change', function() {
+//     const network = this.value;
+//     const dataTypeSelect = document.getElementById('data-type');
+//     const dataPlanSelect = document.getElementById('data-plan');
+//     const costInput = document.getElementById('cost');
+
+//     dataTypeSelect.innerHTML = '<option value="">Select Data Type</option>';
+//     dataPlanSelect.innerHTML = '<option value="">Select Data Plan</option>';
+//     costInput.value = '';
+
+//     if (network && dataPlans[network]) {
+//         const types = [...new Set(dataPlans[network].plans.map(plan => plan.planType))];
+//         types.forEach(type => {
+//             const option = document.createElement('option');
+//             option.value = type;
+//             option.textContent = type;
+//             dataTypeSelect.appendChild(option);
+//         });
+//     }
+// });
+
+// // Handle data type selection
+// document.getElementById('data-type').addEventListener('change', function() {
+//     const network = document.getElementById('network').value;
+//     const type = this.value;
+//     const dataPlanSelect = document.getElementById('data-plan');
+//     const costInput = document.getElementById('cost');
+
+//     dataPlanSelect.innerHTML = '<option value="">Select Data Plan</option>';
+//     costInput.value = '';
+
+//     if (network && type && dataPlans[network]) {
+//         const filteredPlans = dataPlans[network].plans.filter(plan => plan.planType === type);
+//         filteredPlans.forEach(plan => {
+//             const option = document.createElement('option');
+//             option.value = plan.id;
+//             option.textContent = `${plan.size} - ${plan.amount} (${plan.validity})`;
+//             dataPlanSelect.appendChild(option);
+//         });
+//     }
+// });
+// // Handle data plan selection
+// document.getElementById('data-plan').addEventListener('change', function() {
+//     const network = document.getElementById('network').value;
+//     const type = document.getElementById('data-type').value;
+//     const planId = this.value;
+
+//     if (network && type && planId) {
+//         const selectedPlan = dataPlans[network].plans.find(plan => plan.id == planId);
+//         if (selectedPlan) {
+//             document.getElementById('cost').value = selectedPlan.amount;
+//         }
+//     }
+// });
+
 
 
 // // Handle form submission
@@ -256,12 +264,14 @@ document.getElementById('data-form').addEventListener('submit', function(event) 
 //     const cost = parseFloat(document.getElementById('cost').value.replace('₦', '').replace(',', ''));
 
 //     if (userId && pin && network && plan && cost) {
+//         const networkId = dataPlans[network].pk;  // Get the network primary key (ID)
+        
 //         fetch('http://127.0.0.1:5000/api/validate-pin', {
 //             method: 'POST',
 //             headers: {
 //                 'Content-Type': 'application/json',
 //             },
-//             body: JSON.stringify({ user_id: userId, pin: pin, network: network, plan: plan, cost: cost }),
+//             body: JSON.stringify({ user_id: userId, pin: pin, network_id: networkId, plan: plan, cost: cost }),  // Send network_id instead of network
 //         })
 //         .then(response => response.json())
 //         .then(data => {
@@ -278,6 +288,7 @@ document.getElementById('data-form').addEventListener('submit', function(event) 
 // });
 
 
+// special funtions
 // Function to fetch user data
 function fetchUserData(userId) {
     // Remove brackets if present (for cases like (USER_ID))
