@@ -72,7 +72,6 @@ document.getElementById('data-plan').addEventListener('change', function() {
 });
 
 // Handle form submission
-// Handle form submission
 document.getElementById('data-form').addEventListener('submit', function(event) {
     event.preventDefault();
     
@@ -105,17 +104,6 @@ document.getElementById('data-form').addEventListener('submit', function(event) 
 });
 
 
-
-
-
-// document.getElementById('data-form').addEventListener('submit', function(event) {
-//     event.preventDefault();
-//     alert('Data purchase initiated!');
-//     // Further actions like sending data to the server can be done here.
-// });
-
-
-
 // Function to fetch user data
 function fetchUserData(userId) {
     // Remove brackets if present (for cases like (USER_ID))
@@ -141,43 +129,8 @@ function fetchUserData(userId) {
 
 // Extract user_id from URL parameter
 const urlParams = new URLSearchParams(window.location.search);
-let userId = urlParams.get('user_id');  // Extract raw user ID
+let userId = urlParams.get('user_id');  
 
-// Fetch user data if user_id is provided
 if (userId) {
-    fetchUserData(userId);  // Fetch data using correctly formatted ID
+    fetchUserData(userId); 
 }
-
-
-
-
-// // Function to submit and purchase
-// // Handle form submission
-// document.getElementById('data-form').addEventListener('submit', function(event) {
-//     event.preventDefault();
-
-//     const userId = new URLSearchParams(window.location.search).get('user_id');
-//     const pin = document.getElementById('pin').value;
-
-//     if (userId && pin) {
-//         fetch('http://127.0.0.1:5000/api/validate-pin', {
-//             method: 'POST',
-//             headers: {
-//                 'Content-Type': 'application/json',
-//             },
-//             body: JSON.stringify({ user_id: userId, pin: pin }),
-//         })
-//         .then(response => response.json())
-//         .then(data => {
-//             if (data.valid) {
-//                 alert('PIN is correct. Proceeding with data purchase...');
-//                 // Proceed with further actions like purchasing data
-//             } else {
-//                 alert('Incorrect PIN. Please try again.');
-//             }
-//         })
-//         .catch(error => console.error('Error validating PIN:', error));
-//     } else {
-//         alert('Please enter a PIN.');
-//     }
-// });
