@@ -101,50 +101,6 @@ const dataPlans = {
 
 
 
-// // Handle network selection
-// document.getElementById('network').addEventListener('change', function() {
-//     const network = this.value;
-//     const dataTypeSelect = document.getElementById('data-type');
-//     const dataPlanSelect = document.getElementById('data-plan');
-//     const costInput = document.getElementById('cost');
-
-//     dataTypeSelect.innerHTML = '<option value="">Select Data Type</option>';
-//     dataPlanSelect.innerHTML = '<option value="">Select Data Plan</option>';
-//     costInput.value = '';
-
-//     if (network && dataPlans[network]) {
-//         const types = [...new Set(dataPlans[network].plans.map(plan => plan.planType))];
-//         types.forEach(type => {
-//             const option = document.createElement('option');
-//             option.value = type;
-//             option.textContent = type;
-//             dataTypeSelect.appendChild(option);
-//         });
-//     }
-// });
-
-// // Handle data type selection
-// document.getElementById('data-type').addEventListener('change', function() {
-//     const network = document.getElementById('network').value;
-//     const type = this.value;
-//     const dataPlanSelect = document.getElementById('data-plan');
-//     const costInput = document.getElementById('cost');
-
-//     dataPlanSelect.innerHTML = '<option value="">Select Data Plan</option>';
-//     costInput.value = '';
-
-//     if (network && type && dataPlans[network]) {
-//         const filteredPlans = dataPlans[network].plans.filter(plan => plan.planType === type);
-//         filteredPlans.forEach(plan => {
-//             const option = document.createElement('option');
-//             option.value = plan.id;
-//             option.textContent = `${plan.size} - ${plan.amount} (${plan.validity})`;
-//             dataPlanSelect.appendChild(option);
-//         });
-//     }
-// });
-
-
 // Handle network selection
 document.getElementById('network').addEventListener('change', function() {
     const network = this.value;
@@ -156,8 +112,8 @@ document.getElementById('network').addEventListener('change', function() {
     dataPlanSelect.innerHTML = '<option value="">Select Data Plan</option>';
     costInput.value = '';
 
-    if (network) {
-        const types = [...new Set(dataPlans[network].map(plan => plan.planType))];
+    if (network && dataPlans[network]) {
+        const types = [...new Set(dataPlans[network].plans.map(plan => plan.planType))];
         types.forEach(type => {
             const option = document.createElement('option');
             option.value = type;
@@ -166,8 +122,6 @@ document.getElementById('network').addEventListener('change', function() {
         });
     }
 });
-
-
 
 // Handle data type selection
 document.getElementById('data-type').addEventListener('change', function() {
@@ -179,8 +133,8 @@ document.getElementById('data-type').addEventListener('change', function() {
     dataPlanSelect.innerHTML = '<option value="">Select Data Plan</option>';
     costInput.value = '';
 
-    if (network && type) {
-        const filteredPlans = dataPlans[network].filter(plan => plan.planType === type);
+    if (network && type && dataPlans[network]) {
+        const filteredPlans = dataPlans[network].plans.filter(plan => plan.planType === type);
         filteredPlans.forEach(plan => {
             const option = document.createElement('option');
             option.value = plan.id;
@@ -189,6 +143,52 @@ document.getElementById('data-type').addEventListener('change', function() {
         });
     }
 });
+
+
+// // Handle network selection
+// document.getElementById('network').addEventListener('change', function() {
+//     const network = this.value;
+//     const dataTypeSelect = document.getElementById('data-type');
+//     const dataPlanSelect = document.getElementById('data-plan');
+//     const costInput = document.getElementById('cost');
+
+//     dataTypeSelect.innerHTML = '<option value="">Select Data Type</option>';
+//     dataPlanSelect.innerHTML = '<option value="">Select Data Plan</option>';
+//     costInput.value = '';
+
+//     if (network) {
+//         const types = [...new Set(dataPlans[network].map(plan => plan.planType))];
+//         types.forEach(type => {
+//             const option = document.createElement('option');
+//             option.value = type;
+//             option.textContent = type;
+//             dataTypeSelect.appendChild(option);
+//         });
+//     }
+// });
+
+
+
+// // Handle data type selection
+// document.getElementById('data-type').addEventListener('change', function() {
+//     const network = document.getElementById('network').value;
+//     const type = this.value;
+//     const dataPlanSelect = document.getElementById('data-plan');
+//     const costInput = document.getElementById('cost');
+
+//     dataPlanSelect.innerHTML = '<option value="">Select Data Plan</option>';
+//     costInput.value = '';
+
+//     if (network && type) {
+//         const filteredPlans = dataPlans[network].filter(plan => plan.planType === type);
+//         filteredPlans.forEach(plan => {
+//             const option = document.createElement('option');
+//             option.value = plan.id;
+//             option.textContent = `${plan.size} - ${plan.amount} (${plan.validity})`;
+//             dataPlanSelect.appendChild(option);
+//         });
+//     }
+// });
 
 
 
@@ -201,10 +201,13 @@ document.getElementById('data-plan').addEventListener('change', function() {
     const planId = this.value;
 
     if (network && type && planId) {
-        const selectedPlan = dataPlans[network].find(plan => plan.id == planId);
-        document.getElementById('cost').value = selectedPlan.amount;
+        const selectedPlan = dataPlans[network].plans.find(plan => plan.id == planId);
+        if (selectedPlan) {
+            document.getElementById('cost').value = selectedPlan.amount;
+        }
     }
 });
+
 
 
 // Handle form submission
