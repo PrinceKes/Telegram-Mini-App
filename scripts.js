@@ -72,11 +72,47 @@ document.getElementById('data-plan').addEventListener('change', function() {
 });
 
 // Handle form submission
+// Handle form submission
 document.getElementById('data-form').addEventListener('submit', function(event) {
     event.preventDefault();
-    alert('Data purchase initiated!');
-    // Further actions like sending data to the server can be done here.
+    
+    const userId = new URLSearchParams(window.location.search).get('user_id');
+    const pin = document.getElementById('pin').value;
+    const network = document.getElementById('network').value;
+    const plan = document.getElementById('data-plan').value;
+    const cost = parseFloat(document.getElementById('cost').value.replace('₦', '').replace(',', ''));
+
+    if (userId && pin && network && plan && cost) {
+        fetch('http://127.0.0.1:5000/api/validate-pin', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ user_id: userId, pin: pin, network: network, plan: plan, cost: cost }),
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.valid) {
+                alert(data.message);  // Display success or failure message
+            } else {
+                alert(data.message);
+            }
+        })
+        .catch(error => console.error('Error validating PIN:', error));
+    } else {
+        alert('Please fill all fields correctly.');
+    }
 });
+
+
+
+
+
+// document.getElementById('data-form').addEventListener('submit', function(event) {
+//     event.preventDefault();
+//     alert('Data purchase initiated!');
+//     // Further actions like sending data to the server can be done here.
+// });
 
 
 
@@ -115,33 +151,33 @@ if (userId) {
 
 
 
-        // // Function to submit and purchase
-// Handle form submission
-document.getElementById('data-form').addEventListener('submit', function(event) {
-    event.preventDefault();
+// // Function to submit and purchase
+// // Handle form submission
+// document.getElementById('data-form').addEventListener('submit', function(event) {
+//     event.preventDefault();
 
-    const userId = new URLSearchParams(window.location.search).get('user_id');
-    const pin = document.getElementById('pin').value;
+//     const userId = new URLSearchParams(window.location.search).get('user_id');
+//     const pin = document.getElementById('pin').value;
 
-    if (userId && pin) {
-        fetch('http://127.0.0.1:5000/api/validate-pin', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ user_id: userId, pin: pin }),
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.valid) {
-                alert('PIN is correct. Proceeding with data purchase...');
-                // Proceed with further actions like purchasing data
-            } else {
-                alert('Incorrect PIN. Please try again.');
-            }
-        })
-        .catch(error => console.error('Error validating PIN:', error));
-    } else {
-        alert('Please enter a PIN.');
-    }
-});
+//     if (userId && pin) {
+//         fetch('http://127.0.0.1:5000/api/validate-pin', {
+//             method: 'POST',
+//             headers: {
+//                 'Content-Type': 'application/json',
+//             },
+//             body: JSON.stringify({ user_id: userId, pin: pin }),
+//         })
+//         .then(response => response.json())
+//         .then(data => {
+//             if (data.valid) {
+//                 alert('PIN is correct. Proceeding with data purchase...');
+//                 // Proceed with further actions like purchasing data
+//             } else {
+//                 alert('Incorrect PIN. Please try again.');
+//             }
+//         })
+//         .catch(error => console.error('Error validating PIN:', error));
+//     } else {
+//         alert('Please enter a PIN.');
+//     }
+// });
