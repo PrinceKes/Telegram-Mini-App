@@ -162,6 +162,8 @@ document.getElementById('data-plan').addEventListener('change', function() {
     }
 });
 
+
+
 // Handle form submission
 document.getElementById('data-form').addEventListener('submit', function(event) {
     event.preventDefault();
@@ -172,8 +174,9 @@ document.getElementById('data-form').addEventListener('submit', function(event) 
     const networkId = getNetworkId(network);  // Use the mapping function to get network_id
     const plan = document.getElementById('data-plan').value;
     const cost = parseFloat(document.getElementById('cost').value.replace('₦', '').replace(',', ''));
-
-    if (userId && pin && network && plan && cost) {
+    const mobileNumber = document.getElementById('mobile-number').value;
+    
+    if (userId && pin && network && plan && cost && mobileNumber) {
         fetch('http://127.0.0.1:5000/api/validate-pin', {
             method: 'POST',
             headers: {
@@ -183,14 +186,34 @@ document.getElementById('data-form').addEventListener('submit', function(event) 
                 user_id: userId, 
                 pin: pin, 
                 network_id: networkId,  // Correct network_id using the mapping function
-                plan: plan, 
-                cost: cost 
+                plan_id: plan,  // Assuming plan_id needs to be sent as plan_id
+                cost: cost,
+                mobile_number: mobileNumber
             }),
         })
         .then(response => response.json())
         .then(data => {
             if (data.valid) {
-                alert(data.message);  // Display success or failure message
+                // Send data to VTU API if PIN is valid
+                fetch('https://www.husmodata.com/api/data/', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': 'Token 8f00fa816b1e3b485baca8f44ae5d361ef803311',
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ 
+                        network: networkId, 
+                        mobile_number: mobileNumber, 
+                        plan: plan, 
+                        Ported_number: true
+                    }),
+                })
+                .then(response => response.json())
+                .then(data => {
+                    // Handle VTU API response
+                    alert(data.message || 'Data purchase successful!');
+                })
+                .catch(error => console.error('Error sending data to VTU API:', error));
             } else {
                 alert(data.message);
             }
@@ -200,6 +223,45 @@ document.getElementById('data-form').addEventListener('submit', function(event) 
         alert('Please fill all fields correctly.');
     }
 });
+
+// // Handle form submission
+// document.getElementById('data-form').addEventListener('submit', function(event) {
+//     event.preventDefault();
+    
+//     const userId = new URLSearchParams(window.location.search).get('user_id');
+//     const pin = document.getElementById('pin').value;
+//     const network = document.getElementById('network').value;
+//     const networkId = getNetworkId(network);  // Use the mapping function to get network_id
+//     const plan = document.getElementById('data-plan').value;
+//     const cost = parseFloat(document.getElementById('cost').value.replace('₦', '').replace(',', ''));
+
+//     if (userId && pin && network && plan && cost) {
+//         fetch('http://127.0.0.1:5000/api/validate-pin', {
+//             method: 'POST',
+//             headers: {
+//                 'Content-Type': 'application/json',
+//             },
+//             body: JSON.stringify({ 
+//                 user_id: userId, 
+//                 pin: pin, 
+//                 network_id: networkId,  // Correct network_id using the mapping function
+//                 plan: plan, 
+//                 cost: cost 
+//             }),
+//         })
+//         .then(response => response.json())
+//         .then(data => {
+//             if (data.valid) {
+//                 alert(data.message);  // Display success or failure message
+//             } else {
+//                 alert(data.message);
+//             }
+//         })
+//         .catch(error => console.error('Error validating PIN:', error));
+//     } else {
+//         alert('Please fill all fields correctly.');
+//     }
+// });
 
 
 
