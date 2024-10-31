@@ -6,6 +6,111 @@ body {
 }
 
 .container {
+    max-width: 90%; /* Changed from 400px to 90% for responsiveness */
+    margin: 20px auto;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+h1 {
+    text-align: center;
+    color: #000000;
+    font-weight: 800;
+}
+
+.balance-box {
+    text-align: left;
+    padding-left: 30px;
+    margin-bottom: 25px;
+    font-size: 0.8em;
+    background: transparent;
+    border: 2px solid rgba(255, 255, 255, .2);
+    backdrop-filter: blur(25px);
+    box-shadow: 0 0 10px rgba(0, 0, 0, .2);
+    width: 100%; /* Changed from 80% to 100% for responsiveness */
+    height: 100px;
+    border-radius: 5px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    color: bisque;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.cost-form-group, .number-form-group, .pin-form-group {
+    width: 100%; /* Changed from fixed widths to 100% for responsiveness */
+}
+
+label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 700;
+}
+
+select, input[type="text"], input[type="password"] {
+    width: 100%;
+    padding: 10px;
+    margin: 5px 0 10px 0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+input[readonly] {
+    background-color: #f9f9f9;
+}
+
+button {
+    width: 100%;
+    padding: 10px;
+    background-color: #4CAF50;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    font-size: 1em;
+    cursor: pointer;
+    margin-top: 20px;
+}
+
+button:hover {
+    background-color: #0505ab;
+}
+
+/* Added media queries for better responsiveness */
+
+@media (max-width: 768px) {
+    .container {
+        padding: 10px;
+    }
+    h1 {
+        font-size: 1.2em;
+    }
+}
+
+@media (max-width: 480px) {
+    .container {
+        margin: 10px;
+        padding: 5px;
+    }
+    h1 {
+        font-size: 1em;
+    }
+    .balance-box {
+        padding-left: 10px;
+        height: 80px;
+    }
+}
+
+/* body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-image: linear-gradient(rgb(153, 53, 192),rgb(58, 0, 124));
+}
+
+.container {
     max-width: 400px;
     margin: 20px auto;
     padding: 20px;
@@ -98,3 +203,4 @@ button:hover {
         font-size: 1.5em;
     }
 }
+ */
