@@ -2,21 +2,23 @@ body {
     font-family: Arial, sans-serif;
     margin: 0;
     padding: 0;
-    background-image: linear-gradient(rgb(153, 53, 192),rgb(58, 0, 124));
+    background-color: #ccc;
+    
 }
 
 .container {
-    max-width: 90%; /* Changed from 400px to 90% for responsiveness */
+    width: 90%;
     margin: 20px auto;
     padding: 20px;
     border-radius: 10px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    /* box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); */
+    align-items: center;
 }
 
 h1 {
     text-align: center;
     color: #000000;
-    font-weight: 800;
+    font-weight: 600;
 }
 
 .balance-box {
@@ -28,26 +30,28 @@ h1 {
     border: 2px solid rgba(255, 255, 255, .2);
     backdrop-filter: blur(25px);
     box-shadow: 0 0 10px rgba(0, 0, 0, .2);
-    width: 100%; /* Changed from 80% to 100% for responsiveness */
+    width: 90%;
     height: 100px;
     border-radius: 5px;
     padding-top: 10px;
     padding-bottom: 10px;
-    color: bisque;
+    /* color: bisque; */
+    color: rgb(224, 169, 101);
 }
 
 .form-group {
-    margin-bottom: 15px;
+    margin-bottom: 10px;
 }
 
 .cost-form-group, .number-form-group, .pin-form-group {
-    width: 100%; /* Changed from fixed widths to 100% for responsiveness */
+    width: 97%;
 }
 
 label {
     display: block;
     margin-bottom: 5px;
-    font-weight: 700;
+    font-weight: 500;
+    margin-left: 5px;
 }
 
 select, input[type="text"], input[type="password"] {
@@ -65,7 +69,7 @@ input[readonly] {
 button {
     width: 100%;
     padding: 10px;
-    background-color: #4CAF50;
+    background-color: #297e2c;
     color: #fff;
     border: none;
     border-radius: 5px;
@@ -78,7 +82,6 @@ button:hover {
     background-color: #0505ab;
 }
 
-/* Added media queries for better responsiveness */
 
 @media (max-width: 768px) {
     .container {
